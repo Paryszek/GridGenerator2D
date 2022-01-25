@@ -1,0 +1,14 @@
+{
+    "name": "com.mparysz.procedural-grid-generator-2d",
+    "rootNamespace": "MParysz.ProceduralGridGenerator2D",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
