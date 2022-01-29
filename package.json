@@ -9,5 +9,12 @@
   "author": {
     "name": "Michal Parysz",
     "email": "miparysz@gmail.com"
-  }
+  },
+  "samples": [
+    {
+        "displayName": "Sample Procedural Grid Generator 2D",
+        "description": "Scene with example implementation",
+        "path": "Samples/"
+    }
+  ]
 }
