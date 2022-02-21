@@ -60,10 +60,10 @@ public class Example : MonoBehaviour {
   private void PickGenerationType() {
     switch (generationType) {
       case ProceduralGridGenerator2DType.CELLULAR_AUTOMATA:
-        generator = new ProceduralGridGeneratorCellularAutomata(roomWidth, roomHight);
+        generator = new ProceduralGridGeneratorCellularAutomata(roomHight, roomWidth);
         break;
       case ProceduralGridGenerator2DType.AGENTS:
-        generator = new ProceduralGridGeneratorAgents(roomWidth, roomHight);
+        generator = new ProceduralGridGeneratorAgents(roomHight, roomWidth);
         break;
     }
   }
