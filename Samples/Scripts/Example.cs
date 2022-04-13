@@ -17,7 +17,7 @@ public class Example : MonoBehaviour {
 
   [Header("References")]
   [SerializeField] private GameObject emptySquare;
-  [SerializeField] private GameObject floorSquare;
+  [SerializeField] private GameObject fillSquare;
   [SerializeField] private GameObject squareParent;
   [SerializeField] private Button generateButton;
   [SerializeField] private Button nextButton;
@@ -53,11 +53,11 @@ public class Example : MonoBehaviour {
         GameObject square = null;
 
         switch (grid[i, j]) {
+          case SquareType.FILL:
+            square = Instantiate(fillSquare, new Vector2(i, j), Quaternion.identity);
+            break;
           case SquareType.EMPTY:
             square = Instantiate(emptySquare, new Vector2(i, j), Quaternion.identity);
-            break;
-          case SquareType.FLOOR:
-            square = Instantiate(floorSquare, new Vector2(i, j), Quaternion.identity);
             break;
         }
 
@@ -73,10 +73,10 @@ public class Example : MonoBehaviour {
   private void PickGenerationType() {
     switch (generationType) {
       case ProceduralGridGenerator2DType.CELLULAR_AUTOMATA:
-        generator = new ProceduralGridGeneratorCellularAutomata(roomHight, roomWidth, 1, 0.45f);
+        generator = new ProceduralGridGeneratorCellularAutomata(roomWidth, roomHight, 1, 0.45f);
         break;
       case ProceduralGridGenerator2DType.AGENTS:
-        generator = new ProceduralGridGeneratorAgents(roomHight, roomWidth);
+        generator = new ProceduralGridGeneratorAgents(roomWidth, roomHight);
         break;
     }
   }

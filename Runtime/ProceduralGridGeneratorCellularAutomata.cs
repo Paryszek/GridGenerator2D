@@ -6,8 +6,8 @@ namespace MParysz.ProceduralGridGenerator2D {
     private int iterations = 4;
     private SquareType[,] grid;
 
-    public ProceduralGridGeneratorCellularAutomata(int roomHight, int roomWidth) : base(roomHight, roomWidth) { }
-    public ProceduralGridGeneratorCellularAutomata(int roomHight, int roomWidth, int iterations, float noiseDensity) : base(roomHight, roomWidth) {
+    public ProceduralGridGeneratorCellularAutomata(int roomWidth, int roomHight) : base(roomWidth, roomHight) { }
+    public ProceduralGridGeneratorCellularAutomata(int roomWidth, int roomHight, int iterations, float noiseDensity) : base(roomWidth, roomHight) {
       this.iterations = iterations;
       this.noiseDensity = noiseDensity;
     }
@@ -38,11 +38,11 @@ namespace MParysz.ProceduralGridGenerator2D {
       for (var i = 0; i < roomWidth; i++) {
         for (var j = 0; j < roomHight; j++) {
           if (Random.value > noiseDensity) {
-            grid[i, j] = SquareType.EMPTY;
+            grid[i, j] = SquareType.FILL;
             continue;
           }
 
-          grid[i, j] = SquareType.FLOOR;
+          grid[i, j] = SquareType.EMPTY;
         }
       }
     }
@@ -53,15 +53,15 @@ namespace MParysz.ProceduralGridGenerator2D {
 
         for (int i = 0; i < roomWidth; i++) {
           for (int j = 0; j < roomHight; j++) {
-            var emptyNumber = 0;
+            var fillNumber = 0;
             var border = false;
 
             for (int k = i - 1; k <= i + 1; k++) {
               for (int l = j - 1; l <= j + 1; l++) {
                 if (k >= 0 && l >= 0 && k < roomWidth && l < roomHight) {
                   if (k != i || l != j) {
-                    if (tempGrid[k, l] == SquareType.EMPTY) {
-                      emptyNumber++;
+                    if (tempGrid[k, l] == SquareType.FILL) {
+                      fillNumber++;
                     }
                   }
                 } else {
@@ -70,10 +70,10 @@ namespace MParysz.ProceduralGridGenerator2D {
               }
             }
 
-            if (emptyNumber > 4 || border) {
-              grid[i, j] = SquareType.EMPTY;
+            if (fillNumber > 4 || border) {
+              grid[i, j] = SquareType.FILL;
             } else {
-              grid[i, j] = SquareType.FLOOR;
+              grid[i, j] = SquareType.EMPTY;
             }
           }
         }

@@ -18,8 +18,8 @@ namespace MParysz.ProceduralGridGenerator2D {
     SquareType[,] grid;
     List<Agent> agents;
 
-    public ProceduralGridGeneratorAgents(int roomHight, int roomWidth) : base(roomHight, roomWidth) { }
-    public ProceduralGridGeneratorAgents(int roomHight, int roomWidth, int maxAgents, float fillPercentage, float changeDirectionChance, float addNewAgentChance, float removeAgentChance) : base(roomHight, roomWidth) {
+    public ProceduralGridGeneratorAgents(int roomWidth, int roomHight) : base(roomWidth, roomHight) { }
+    public ProceduralGridGeneratorAgents(int roomWidth, int roomHight, int maxAgents, float fillPercentage, float changeDirectionChance, float addNewAgentChance, float removeAgentChance) : base(roomHight, roomWidth) {
       this.maxAgents = maxAgents;
       this.fillPercentage = fillPercentage;
       this.changeDirectionChance = changeDirectionChance;
@@ -47,7 +47,7 @@ namespace MParysz.ProceduralGridGenerator2D {
 
       for (var i = 0; i < roomWidth; i++) {
         for (var j = 0; j < roomHight; j++) {
-          grid[i, j] = SquareType.EMPTY;
+          grid[i, j] = SquareType.FILL;
         }
       }
 
@@ -68,11 +68,11 @@ namespace MParysz.ProceduralGridGenerator2D {
 
       do {
         foreach (var agent in agents) {
-          if (grid[(int)agent.position.x, (int)agent.position.y] == SquareType.FLOOR) {
+          if (grid[(int)agent.position.x, (int)agent.position.y] == SquareType.EMPTY) {
             continue;
           }
 
-          grid[(int)agent.position.x, (int)agent.position.y] = SquareType.FLOOR;
+          grid[(int)agent.position.x, (int)agent.position.y] = SquareType.EMPTY;
         }
 
         foreach (var agent in agents) {
@@ -124,7 +124,7 @@ namespace MParysz.ProceduralGridGenerator2D {
 
       for (var i = 0; i < roomWidth; i++) {
         for (var j = 0; j < roomHight; j++) {
-          if (grid[i, j] != SquareType.FLOOR) {
+          if (grid[i, j] != SquareType.EMPTY) {
             continue;
           }
 
