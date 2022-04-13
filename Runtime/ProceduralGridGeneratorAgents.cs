@@ -34,6 +34,14 @@ namespace MParysz.ProceduralGridGenerator2D {
       return grid;
     }
 
+    public override SquareType[,] NextIteration() {
+      if (grid == null) {
+        return GenerateGrid();
+      }
+
+      return grid;
+    }
+
     private void Setup() {
       grid = new SquareType[roomWidth, roomHight];
 

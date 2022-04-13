@@ -15,5 +15,6 @@ namespace MParysz.ProceduralGridGenerator2D {
     }
 
     public abstract SquareType[,] GenerateGrid();
+    public abstract SquareType[,] NextIteration();
   }
 }
