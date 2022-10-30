@@ -1,8 +1,6 @@
 using UnityEngine;
 using MParysz.ProceduralGridGenerator2D;
 using UnityEngine.UI;
-using System;
-using System.Collections.Generic;
 
 internal enum ProceduralGridGenerator2DType {
   CELLULAR_AUTOMATA,
@@ -12,8 +10,8 @@ internal enum ProceduralGridGenerator2DType {
 public class Example : MonoBehaviour {
   [Header("Input")]
   [SerializeField] private ProceduralGridGenerator2DType generationType = ProceduralGridGenerator2DType.CELLULAR_AUTOMATA;
-  [SerializeField] private int roomHight = 50;
-  [SerializeField] private int roomWidth = 80;
+  [SerializeField] private int roomHeight = 50;
+  [SerializeField] private int roomWidth = 50;
 
   [Header("References")]
   [SerializeField] private GameObject emptySquare;
@@ -49,7 +47,7 @@ public class Example : MonoBehaviour {
 
   private void CreateGrid(SquareType[,] grid) {
     for (var i = 0; i < roomWidth; i++) {
-      for (var j = 0; j < roomHight; j++) {
+      for (var j = 0; j < roomHeight; j++) {
         GameObject square = null;
 
         switch (grid[i, j]) {
@@ -73,10 +71,10 @@ public class Example : MonoBehaviour {
   private void PickGenerationType() {
     switch (generationType) {
       case ProceduralGridGenerator2DType.CELLULAR_AUTOMATA:
-        generator = new ProceduralGridGeneratorCellularAutomata(roomWidth, roomHight, 1, 0.45f);
+        generator = new ProceduralGridGeneratorCellularAutomata(roomWidth, roomHeight, 1, 0.45f);
         break;
       case ProceduralGridGenerator2DType.AGENTS:
-        generator = new ProceduralGridGeneratorAgents(roomWidth, roomHight);
+        generator = new ProceduralGridGeneratorAgents(roomWidth, roomHeight, 40);
         break;
     }
   }

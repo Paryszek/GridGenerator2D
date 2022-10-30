@@ -7,11 +7,11 @@ namespace MParysz.ProceduralGridGenerator2D {
 
   public abstract class ProceduralGridGeneratorBase {
     protected int roomWidth;
-    protected int roomHight;
+    protected int roomHeight;
 
-    public ProceduralGridGeneratorBase(int roomWidth, int roomHight) {
+    public ProceduralGridGeneratorBase(int roomWidth, int roomHeight) {
       this.roomWidth = roomWidth;
-      this.roomHight = roomHight;
+      this.roomHeight = roomHeight;
     }
 
     public abstract SquareType[,] GenerateGrid();

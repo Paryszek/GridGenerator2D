@@ -9,16 +9,20 @@ namespace MParysz.ProceduralGridGenerator2D {
 
   public class ProceduralGridGeneratorAgents : ProceduralGridGeneratorBase {
     private int maxAgents = 20;
-    private float fillPercentage = 0.4f;
-    private float changeDirectionChance = 0.5f;
-    private float addNewAgentChance = 0.05f;
-    private float removeAgentChance = 0.05f;
-    private readonly int maxIterations = 100000;
+    private float fillPercentage = 0.5f;
+    private float changeDirectionChance = 0.7f;
+    private float addNewAgentChance = 0.25f;
+    private float removeAgentChance = 0.1f;
+    private readonly int maxIterations = 1000000;
+    private int currentCornerIndex = -1;
 
     SquareType[,] grid;
     List<Agent> agents;
 
     public ProceduralGridGeneratorAgents(int roomWidth, int roomHight) : base(roomWidth, roomHight) { }
+    public ProceduralGridGeneratorAgents(int roomWidth, int roomHight, int maxAgents) : base(roomWidth, roomHight) {
+      this.maxAgents = maxAgents;
+    }
     public ProceduralGridGeneratorAgents(int roomWidth, int roomHight, int maxAgents, float fillPercentage, float changeDirectionChance, float addNewAgentChance, float removeAgentChance) : base(roomHight, roomWidth) {
       this.maxAgents = maxAgents;
       this.fillPercentage = fillPercentage;
@@ -43,10 +47,10 @@ namespace MParysz.ProceduralGridGenerator2D {
     }
 
     private void Setup() {
-      grid = new SquareType[roomWidth, roomHight];
+      grid = new SquareType[roomWidth, roomHeight];
 
       for (var i = 0; i < roomWidth; i++) {
-        for (var j = 0; j < roomHight; j++) {
+        for (var j = 0; j < roomHeight; j++) {
           grid[i, j] = SquareType.FILL;
         }
       }
@@ -54,13 +58,9 @@ namespace MParysz.ProceduralGridGenerator2D {
       agents = new List<Agent>();
 
       var agent = new Agent();
-      agent.position = new Vector2(Mathf.FloorToInt(roomWidth / 2), Mathf.FloorToInt(roomHight / 2));
+      agent.position = new Vector2(Mathf.FloorToInt(roomWidth / 2), Mathf.FloorToInt(roomHeight / 2));
       agent.direction = GetRandomDirection();
       agents.Add(agent);
-    }
-
-    private Vector2 GetRandomPosition() {
-      return new Vector2(Random.Range(0, roomWidth - 1), Random.Range(0, roomHight - 1));
     }
 
     private void Generate() {
@@ -79,7 +79,7 @@ namespace MParysz.ProceduralGridGenerator2D {
           agent.position += agent.direction;
 
           agent.position.x = Mathf.Clamp(agent.position.x, 0, roomWidth - 1);
-          agent.position.y = Mathf.Clamp(agent.position.y, 0, roomHight - 1);
+          agent.position.y = Mathf.Clamp(agent.position.y, 0, roomHeight - 1);
 
           if (Random.value < changeDirectionChance) {
             agent.direction = GetRandomDirection();
@@ -102,10 +102,7 @@ namespace MParysz.ProceduralGridGenerator2D {
             continue;
           }
 
-          var newAgent = new Agent();
-          newAgent.direction = GetRandomDirection();
-          newAgent.position = agents[i].position;
-          agents.Add(newAgent);
+          agents.Add(CreateAgent());
           break;
         }
 
@@ -123,7 +120,7 @@ namespace MParysz.ProceduralGridGenerator2D {
       var floors = 0;
 
       for (var i = 0; i < roomWidth; i++) {
-        for (var j = 0; j < roomHight; j++) {
+        for (var j = 0; j < roomHeight; j++) {
           if (grid[i, j] != SquareType.EMPTY) {
             continue;
           }
@@ -148,6 +145,61 @@ namespace MParysz.ProceduralGridGenerator2D {
         default:
           return Vector2.right;
       }
+    }
+
+    private Agent CreateAgent() {
+      Vector2Int corner = Vector2Int.zero;
+
+      currentCornerIndex++;
+      if (currentCornerIndex == 4) {
+        currentCornerIndex = 0;
+      }
+
+      switch (currentCornerIndex) {
+        case 0:
+          corner = new Vector2Int(0, 0);
+          break;
+        case 1:
+          corner = new Vector2Int(0, 1);
+          break;
+        case 2:
+          corner = new Vector2Int(1, 1);
+          break;
+        case 3:
+          corner = new Vector2Int(1, 0);
+          break;
+
+      }
+
+      var (boundryWidth, boundryHeight) = GetBoundry(corner);
+
+      var agent = new Agent();
+      agent.position = new Vector2(Random.Range(boundryWidth.x, boundryWidth.y), Random.Range(boundryHeight.x, boundryHeight.y));
+      agent.direction = GetRandomDirection();
+
+      return agent;
+    }
+
+    private (Vector2Int, Vector2Int) GetBoundry(Vector2Int corner) {
+      var width = this.roomWidth;
+      var height = this.roomHeight;
+
+      var topHeight = new Vector2Int(Mathf.CeilToInt(height / 2), height);
+      var bottomHeigh = new Vector2Int(0, Mathf.CeilToInt(height / 2));
+      var rightWidth = new Vector2Int(Mathf.CeilToInt(width / 2), width);
+      var leftWidth = new Vector2Int(0, Mathf.CeilToInt(width / 2));
+
+      if (corner == new Vector2Int(1, 1)) {
+        return (rightWidth, topHeight);
+      } else if (corner == new Vector2Int(0, 0)) {
+        return (leftWidth, bottomHeigh);
+      } else if (corner == new Vector2Int(0, 1)) {
+        return (leftWidth, topHeight);
+      } else if (corner == new Vector2Int(1, 0)) {
+        return (rightWidth, bottomHeigh);
+      }
+
+      return (new Vector2Int(0, 0), new Vector2Int(width, height));
     }
   }
 }
