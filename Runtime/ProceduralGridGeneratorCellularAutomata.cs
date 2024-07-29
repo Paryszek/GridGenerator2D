@@ -4,15 +4,15 @@ namespace MParysz.ProceduralGridGenerator2D
 {
   public class ProceduralGridGeneratorCellularAutomata : ProceduralGridGeneratorBase
   {
-    private float noiseDensity = 0.45f;
-    private int iterations = 4;
-    private SquareType[,] grid;
+    private float _noiseDensity = 0.45f;
+    private int _iterations = 4;
+    private SquareType[,] _grid;
 
     public ProceduralGridGeneratorCellularAutomata(int roomWidth, int roomHeight) : base(roomWidth, roomHeight) { }
     public ProceduralGridGeneratorCellularAutomata(int roomWidth, int roomHeight, int iterations, float noiseDensity) : base(roomWidth, roomHeight)
     {
-      this.iterations = iterations;
-      this.noiseDensity = noiseDensity;
+      this._iterations = iterations;
+      this._noiseDensity = noiseDensity;
     }
 
     public override SquareType[,] GenerateGrid()
@@ -21,24 +21,24 @@ namespace MParysz.ProceduralGridGenerator2D
       GenerateNoise();
       CellularAutomata();
 
-      return grid;
+      return _grid;
     }
 
     public override SquareType[,] NextIteration()
     {
-      if (grid == null)
+      if (_grid == null)
       {
         return GenerateGrid();
       }
 
       CellularAutomata();
 
-      return grid;
+      return _grid;
     }
 
     private void Setup()
     {
-      grid = new SquareType[roomWidth, roomHeight];
+      _grid = new SquareType[roomWidth, roomHeight];
     }
 
     private void GenerateNoise()
@@ -47,22 +47,22 @@ namespace MParysz.ProceduralGridGenerator2D
       {
         for (var j = 0; j < roomHeight; j++)
         {
-          if (Random.value > noiseDensity)
+          if (Random.value > _noiseDensity)
           {
-            grid[i, j] = SquareType.FILL;
+            _grid[i, j] = SquareType.FILL;
             continue;
           }
 
-          grid[i, j] = SquareType.EMPTY;
+          _grid[i, j] = SquareType.EMPTY;
         }
       }
     }
 
     private void CellularAutomata()
     {
-      for (int iteration = 0; iteration < iterations; iteration++)
+      for (int iteration = 0; iteration < _iterations; iteration++)
       {
-        SquareType[,] tempGrid = (SquareType[,])grid.Clone();
+        SquareType[,] tempGrid = (SquareType[,])_grid.Clone();
 
         for (int i = 0; i < roomWidth; i++)
         {
@@ -94,11 +94,11 @@ namespace MParysz.ProceduralGridGenerator2D
 
             if (fillNumber > 4 || border)
             {
-              grid[i, j] = SquareType.FILL;
+              _grid[i, j] = SquareType.FILL;
             }
             else
             {
-              grid[i, j] = SquareType.EMPTY;
+              _grid[i, j] = SquareType.EMPTY;
             }
           }
         }

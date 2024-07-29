@@ -2,12 +2,14 @@ using UnityEngine;
 using MParysz.ProceduralGridGenerator2D;
 using UnityEngine.UI;
 
-internal enum ProceduralGridGenerator2DType {
+internal enum ProceduralGridGenerator2DType
+{
   CELLULAR_AUTOMATA,
   AGENTS
 }
 
-public class Example : MonoBehaviour {
+public class Example : MonoBehaviour
+{
   [Header("Input")]
   [SerializeField] private ProceduralGridGenerator2DType generationType = ProceduralGridGenerator2DType.CELLULAR_AUTOMATA;
   [SerializeField] private int roomHeight = 50;
@@ -23,12 +25,14 @@ public class Example : MonoBehaviour {
   private ProceduralGridGeneratorBase generator;
   private SquareType[,] grid;
 
-  private void Awake() {
+  private void Awake()
+  {
     generateButton.onClick.AddListener(() => Generate());
     nextButton.onClick.AddListener(() => NextIteration());
   }
 
-  private void Generate() {
+  private void Generate()
+  {
     CleanSquareParent();
     PickGenerationType();
 
@@ -37,7 +41,8 @@ public class Example : MonoBehaviour {
     CreateGrid(grid);
   }
 
-  private void NextIteration() {
+  private void NextIteration()
+  {
     CleanSquareParent();
 
     grid = generator.NextIteration();
@@ -45,12 +50,16 @@ public class Example : MonoBehaviour {
     CreateGrid(grid);
   }
 
-  private void CreateGrid(SquareType[,] grid) {
-    for (var i = 0; i < roomWidth; i++) {
-      for (var j = 0; j < roomHeight; j++) {
+  private void CreateGrid(SquareType[,] grid)
+  {
+    for (var i = 0; i < roomWidth; i++)
+    {
+      for (var j = 0; j < roomHeight; j++)
+      {
         GameObject square = null;
 
-        switch (grid[i, j]) {
+        switch (grid[i, j])
+        {
           case SquareType.FILL:
             square = Instantiate(fillSquare, new Vector2(i, j), Quaternion.identity);
             break;
@@ -59,7 +68,8 @@ public class Example : MonoBehaviour {
             break;
         }
 
-        if (square == null) {
+        if (square == null)
+        {
           continue;
         }
 
@@ -68,8 +78,10 @@ public class Example : MonoBehaviour {
     }
   }
 
-  private void PickGenerationType() {
-    switch (generationType) {
+  private void PickGenerationType()
+  {
+    switch (generationType)
+    {
       case ProceduralGridGenerator2DType.CELLULAR_AUTOMATA:
         generator = new ProceduralGridGeneratorCellularAutomata(roomWidth, roomHeight, 1, 0.45f);
         break;
@@ -79,8 +91,10 @@ public class Example : MonoBehaviour {
     }
   }
 
-  private void CleanSquareParent() {
-    foreach (Transform child in squareParent.transform) {
+  private void CleanSquareParent()
+  {
+    foreach (Transform child in squareParent.transform)
+    {
       Destroy(child.gameObject);
     }
   }

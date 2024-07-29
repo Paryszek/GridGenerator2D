@@ -776,10 +776,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   generationType: 0
-  roomHight: 50
+  roomHeight: 50
   roomWidth: 50
-  emptySquare: {fileID: 6298379919586218691, guid: 3a7a5fb80b7275a45afc6e4010eb6565, type: 3}
-  fillSquare: {fileID: 166719182147565877, guid: 322585d9111f778448628c1286fa6f2c, type: 3}
+  emptySquare: {fileID: 6298379919586218691, guid: 80b449feed7ac487abab3285d1f44b11, type: 3}
+  fillSquare: {fileID: 166719182147565877, guid: 8f48f6b1bff2b41c3a9ca778f604a93f, type: 3}
   squareParent: {fileID: 916712136}
   generateButton: {fileID: 138410661}
   nextButton: {fileID: 1229360694}

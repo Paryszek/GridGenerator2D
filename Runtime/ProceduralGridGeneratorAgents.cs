@@ -3,25 +3,60 @@ using UnityEngine;
 
 namespace MParysz.ProceduralGridGenerator2D
 {
+  public enum AgentSpawnType
+  {
+    RANDOM_POS,
+    AGENT_POS,
+    CENTER
+  }
+
   internal class Agent
   {
-    public Vector2Int position;
-    public Vector2Int direction;
+    public Vector2Int Position
+    {
+      private set; get;
+    }
+    public Vector2Int Direction
+    {
+      private set; get;
+    }
+
+    public Agent(Vector2Int position, Vector2Int direction)
+    {
+      Position = position;
+      Direction = direction;
+    }
+
+    public void SetDirection(Vector2Int direction)
+    {
+      Direction = direction;
+    }
+
+    public void SetPosition(Vector2Int position)
+    {
+      Position = position;
+    }
+
+    public void UpdatePosition(Vector2Int step)
+    {
+      Position += step;
+    }
   }
 
   public class ProceduralGridGeneratorAgents : ProceduralGridGeneratorBase
   {
-    private SquareType[,] grid;
-    private List<Agent> agents;
-    private bool addBorder;
-    private bool removeSingleFillSquares;
-    private readonly int maxIterations = 1000000;
-    private int maxAgents = 20;
-    private int currentCornerIndex = -1;
-    private int numberOfEmptySquares;
-    private float emptySquaresPercentage = 0.55f;
-    private float changeDirectionChance = 0.7f;
-    private float addNewAgentChance = 0.3f;
+    private SquareType[,] _grid;
+    private List<Agent> _agents;
+    private bool _addBorder;
+    private bool _removeSingleFillSquares;
+    private AgentSpawnType _agentSpawnType = AgentSpawnType.RANDOM_POS;
+    private readonly int _maxIterations = 1000000;
+    private int _maxAgents = 20;
+    private int _currentCornerIndex = -1;
+    private int _numberOfEmptySquares;
+    private float _emptySquaresPercentage = 0.55f;
+    private float _changeDirectionChance = 0.7f;
+    private float _addNewAgentChance = 0.3f;
     private float removeAgentChance = 0.1f;
 
     public ProceduralGridGeneratorAgents(int roomWidth, int roomHeight) : base(roomWidth, roomHeight) { }
@@ -30,12 +65,14 @@ namespace MParysz.ProceduralGridGenerator2D
       int roomHeight,
       int maxAgents,
       bool addBorder = true,
-      bool removeSingleFillSquares = false
+      bool removeSingleFillSquares = false,
+      AgentSpawnType agentSpawnType = AgentSpawnType.RANDOM_POS
     ) : base(roomWidth, roomHeight)
     {
-      this.maxAgents = maxAgents;
-      this.addBorder = addBorder;
-      this.removeSingleFillSquares = removeSingleFillSquares;
+      _maxAgents = maxAgents;
+      _addBorder = addBorder;
+      _removeSingleFillSquares = removeSingleFillSquares;
+      _agentSpawnType = agentSpawnType;
     }
     public ProceduralGridGeneratorAgents(
       int roomWidth,
@@ -46,16 +83,18 @@ namespace MParysz.ProceduralGridGenerator2D
       float addNewAgentChance,
       float removeAgentChance,
       bool addBorder = true,
-      bool removeSingleFillSquares = false
+      bool removeSingleFillSquares = false,
+      AgentSpawnType agentSpawnType = AgentSpawnType.RANDOM_POS
     ) : base(roomHeight, roomWidth)
     {
-      this.maxAgents = maxAgents;
-      this.addBorder = addBorder;
-      this.emptySquaresPercentage = emptySquaresPercentage;
-      this.changeDirectionChance = changeDirectionChance;
-      this.addNewAgentChance = addNewAgentChance;
-      this.removeAgentChance = removeAgentChance;
-      this.removeSingleFillSquares = removeSingleFillSquares;
+      _maxAgents = maxAgents;
+      _addBorder = addBorder;
+      _emptySquaresPercentage = emptySquaresPercentage;
+      _changeDirectionChance = changeDirectionChance;
+      _addNewAgentChance = addNewAgentChance;
+      removeAgentChance = removeAgentChance;
+      _removeSingleFillSquares = removeSingleFillSquares;
+      _agentSpawnType = agentSpawnType;
     }
 
     public override SquareType[,] GenerateGrid()
@@ -65,37 +104,33 @@ namespace MParysz.ProceduralGridGenerator2D
       RemoveSingleWalls();
       AddBorder();
 
-      return this.grid;
+      return _grid;
     }
 
     public override SquareType[,] NextIteration()
     {
-      if (this.grid == null)
+      if (_grid == null)
       {
         return GenerateGrid();
       }
 
-      return this.grid;
+      return _grid;
     }
 
     private void Setup()
     {
-      this.grid = new SquareType[roomWidth, roomHeight];
+      _grid = new SquareType[roomWidth, roomHeight];
 
       for (var i = 0; i < roomWidth; i++)
       {
         for (var j = 0; j < roomHeight; j++)
         {
-          this.grid[i, j] = SquareType.FILL;
+          _grid[i, j] = SquareType.FILL;
         }
       }
 
-      this.agents = new List<Agent>();
-
-      var agent = new Agent();
-      agent.position = new Vector2Int(Mathf.FloorToInt(roomWidth / 2), Mathf.FloorToInt(roomHeight / 2));
-      agent.direction = GetRandomDirection();
-      this.agents.Add(agent);
+      _agents = new List<Agent>();
+      _agents.Add(CreateAgentAtCenter());
     }
 
     private void Generate()
@@ -104,75 +139,74 @@ namespace MParysz.ProceduralGridGenerator2D
 
       do
       {
-        foreach (var agent in this.agents)
+        foreach (var agent in _agents)
         {
-          if (this.grid[agent.position.x, agent.position.y] == SquareType.EMPTY)
+          if (_grid[agent.Position.x, agent.Position.y] == SquareType.EMPTY)
           {
             continue;
           }
 
-          this.grid[agent.position.x, agent.position.y] = SquareType.EMPTY;
-          this.numberOfEmptySquares++;
+          _grid[agent.Position.x, agent.Position.y] = SquareType.EMPTY;
+          _numberOfEmptySquares++;
         }
 
-        foreach (var agent in this.agents)
+        foreach (var agent in _agents)
         {
-          agent.position += agent.direction;
+          agent.UpdatePosition(agent.Direction);
 
-          agent.position.x = Mathf.Clamp(agent.position.x, 0, roomWidth - 1);
-          agent.position.y = Mathf.Clamp(agent.position.y, 0, roomHeight - 1);
+          agent.SetPosition(new Vector2Int(Mathf.Clamp(agent.Position.x, 0, roomWidth - 1), Mathf.Clamp(agent.Position.y, 0, roomHeight - 1)));
 
-          if (Random.value < this.changeDirectionChance)
+          if (Random.value < _changeDirectionChance)
           {
-            agent.direction = GetRandomDirection();
+            agent.SetDirection(GetRandomDirection());
           }
         }
 
-        for (var i = 0; i < this.agents.Count; i++)
+        for (var i = 0; i < _agents.Count; i++)
         {
-          if (Random.value > this.removeAgentChance || this.agents.Count <= 1)
+          if (Random.value > removeAgentChance || _agents.Count <= 1)
           {
             continue;
           }
 
-          agents.RemoveAt(i);
+          _agents.RemoveAt(i);
           break;
         }
 
-        for (var i = 0; i < this.agents.Count; i++)
+        for (var i = 0; i < _agents.Count; i++)
         {
-          if (Random.value > this.addNewAgentChance || this.agents.Count >= this.maxAgents)
+          if (Random.value > _addNewAgentChance || _agents.Count >= _maxAgents)
           {
             continue;
           }
 
-          this.agents.Add(CreateAgent());
+          _agents.Add(CreateAgent());
           break;
         }
 
-        var emptySquaresPercentageValue = (float)this.numberOfEmptySquares / (float)this.grid.Length;
+        var emptySquaresPercentageValue = (float)_numberOfEmptySquares / (float)_grid.Length;
 
-        if (emptySquaresPercentageValue >= emptySquaresPercentage)
+        if (emptySquaresPercentageValue >= _emptySquaresPercentage)
         {
           break;
         }
 
         iteration++;
-      } while (iteration < maxIterations);
+      } while (iteration < _maxIterations);
     }
 
     private void RemoveSingleWalls()
     {
-      if (!removeSingleFillSquares)
+      if (!_removeSingleFillSquares)
       {
         return;
       }
 
-      for (int row = 0; row < this.roomWidth - 1; row++)
+      for (int row = 0; row < roomWidth - 1; row++)
       {
-        for (int col = 0; col < this.roomHeight - 1; col++)
+        for (int col = 0; col < roomHeight - 1; col++)
         {
-          var cell = this.grid[row, col];
+          var cell = _grid[row, col];
 
           if (cell != SquareType.FILL)
           {
@@ -186,9 +220,9 @@ namespace MParysz.ProceduralGridGenerator2D
             for (int checkCol = -1; checkCol <= 1; checkCol++)
             {
               if (checkRow + row < 0 ||
-                checkRow + row > this.roomWidth - 1 ||
+                checkRow + row > roomWidth - 1 ||
                 checkCol + col < 0 ||
-                checkCol + col > this.roomHeight - 1)
+                checkCol + col > roomHeight - 1)
               {
                 continue;
               }
@@ -198,7 +232,7 @@ namespace MParysz.ProceduralGridGenerator2D
                 continue;
               }
 
-              if (grid[row + checkRow, col + checkCol] == SquareType.FILL)
+              if (_grid[row + checkRow, col + checkCol] == SquareType.FILL)
               {
 
                 allEmptySquares = false;
@@ -208,7 +242,7 @@ namespace MParysz.ProceduralGridGenerator2D
 
           if (allEmptySquares)
           {
-            this.grid[row, col] = SquareType.EMPTY;
+            _grid[row, col] = SquareType.EMPTY;
           }
         }
       }
@@ -216,35 +250,50 @@ namespace MParysz.ProceduralGridGenerator2D
 
     private void AddBorder()
     {
-      if (!addBorder)
+      if (!_addBorder)
       {
         return;
       }
 
-      for (var i = 0; i < this.roomWidth; i++)
+      for (var i = 0; i < roomWidth; i++)
       {
-        for (var j = 0; j < this.roomHeight; j++)
+        for (var j = 0; j < roomHeight; j++)
         {
-          if (i == 0 || j == 0 || i == this.roomWidth - 1 || j == this.roomHeight - 1)
+          if (i == 0 || j == 0 || i == roomWidth - 1 || j == roomHeight - 1)
           {
-            this.grid[i, j] = SquareType.FILL;
+            _grid[i, j] = SquareType.FILL;
           }
         }
       }
     }
 
 
-    private Agent CreateAgent()
+    private Agent CreateAgent(Agent currentAgent = null)
+    {
+      switch (_agentSpawnType)
+      {
+        case AgentSpawnType.RANDOM_POS:
+          return CreateAgentAtRandomPos();
+        case AgentSpawnType.AGENT_POS:
+          return CreateAgentAtCurrentAgentPos(currentAgent);
+        case AgentSpawnType.CENTER:
+          return CreateAgentAtCenter();
+      }
+
+      return CreateAgentAtRandomPos();
+    }
+
+    private Agent CreateAgentAtRandomPos()
     {
       Vector2Int corner = Vector2Int.zero;
 
-      currentCornerIndex++;
-      if (currentCornerIndex == 4)
+      _currentCornerIndex++;
+      if (_currentCornerIndex == 4)
       {
-        currentCornerIndex = 0;
+        _currentCornerIndex = 0;
       }
 
-      switch (currentCornerIndex)
+      switch (_currentCornerIndex)
       {
         case 0:
           corner = new Vector2Int(0, 0);
@@ -263,17 +312,31 @@ namespace MParysz.ProceduralGridGenerator2D
 
       var (boundryWidth, boundryHeight) = GetBoundry(corner);
 
-      var agent = new Agent();
-      agent.position = new Vector2Int(Random.Range(boundryWidth.x, boundryWidth.y), Random.Range(boundryHeight.x, boundryHeight.y));
-      agent.direction = GetRandomDirection();
+      return new Agent(
+        new Vector2Int(Random.Range(boundryWidth.x, boundryWidth.y),
+        Random.Range(boundryHeight.x, boundryHeight.y)), GetRandomDirection()
+      );
+    }
 
-      return agent;
+    private Agent CreateAgentAtCurrentAgentPos(Agent currentAgent = null)
+    {
+      if (currentAgent == null)
+      {
+        return CreateAgentAtCenter();
+      }
+
+      return new Agent(currentAgent.Position, GetRandomDirection());
+    }
+
+    private Agent CreateAgentAtCenter()
+    {
+      return new Agent(new Vector2Int(Mathf.FloorToInt(roomWidth / 2), Mathf.FloorToInt(roomHeight / 2)), GetRandomDirection());
     }
 
     private (Vector2Int, Vector2Int) GetBoundry(Vector2Int corner)
     {
-      var width = this.roomWidth;
-      var height = this.roomHeight;
+      var width = roomWidth;
+      var height = roomHeight;
 
       var topHeight = new Vector2Int(Mathf.CeilToInt(height / 2), height);
       var bottomHeigh = new Vector2Int(0, Mathf.CeilToInt(height / 2));
