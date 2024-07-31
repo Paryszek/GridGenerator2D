@@ -57,7 +57,7 @@ namespace MParysz.ProceduralGridGenerator2D
     private float _emptySquaresPercentage = 0.55f;
     private float _changeDirectionChance = 0.7f;
     private float _addNewAgentChance = 0.3f;
-    private float removeAgentChance = 0.1f;
+    private float _removeAgentChance = 0.1f;
 
     public ProceduralGridGeneratorAgents(int roomWidth, int roomHeight) : base(roomWidth, roomHeight) { }
     public ProceduralGridGeneratorAgents(
@@ -92,7 +92,7 @@ namespace MParysz.ProceduralGridGenerator2D
       _emptySquaresPercentage = emptySquaresPercentage;
       _changeDirectionChance = changeDirectionChance;
       _addNewAgentChance = addNewAgentChance;
-      removeAgentChance = removeAgentChance;
+      _removeAgentChance = removeAgentChance;
       _removeSingleFillSquares = removeSingleFillSquares;
       _agentSpawnType = agentSpawnType;
     }
@@ -164,7 +164,7 @@ namespace MParysz.ProceduralGridGenerator2D
 
         for (var i = 0; i < _agents.Count; i++)
         {
-          if (Random.value > removeAgentChance || _agents.Count <= 1)
+          if (Random.value > _removeAgentChance || _agents.Count <= 1)
           {
             continue;
           }
