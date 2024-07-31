@@ -180,7 +180,7 @@ namespace MParysz.ProceduralGridGenerator2D
             continue;
           }
 
-          _agents.Add(CreateAgent());
+          _agents.Add(CreateAgent(_agents[i]));
           break;
         }
 
