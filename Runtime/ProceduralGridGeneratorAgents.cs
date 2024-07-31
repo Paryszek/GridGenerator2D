@@ -152,9 +152,13 @@ namespace MParysz.ProceduralGridGenerator2D
 
         foreach (var agent in _agents)
         {
-          agent.UpdatePosition(agent.Direction);
-
-          agent.SetPosition(new Vector2Int(Mathf.Clamp(agent.Position.x, 0, roomWidth - 1), Mathf.Clamp(agent.Position.y, 0, roomHeight - 1)));
+          if (agent.Position.x + agent.Direction.x > 0 &&
+              agent.Position.x + agent.Direction.x < roomWidth - 1 &&
+              agent.Position.y + agent.Direction.y > 0 &&
+              agent.Position.y + agent.Direction.y < roomHeight - 1)
+          {
+            agent.UpdatePosition(agent.Direction);
+          }
 
           if (Random.value < _changeDirectionChance)
           {
